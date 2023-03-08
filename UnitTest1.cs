@@ -1,4 +1,5 @@
 using Microsoft.Playwright;
+using PlaywrightDemo.Pages;
 
 namespace PlaywrightDemo;
 
@@ -27,5 +28,24 @@ public class Tests
         {
             Path = "EAApp.jpg"
         });
+    }
+    public async Task TestWithPOM()
+    {
+        //Playwright
+        using var playwright = await Playwright.CreateAsync();
+        //Browser
+        await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+        {
+            Headless = false
+        });
+        //Page
+        var page = await browser.NewPageAsync();
+        await page.GotoAsync("http://www.eaapp.somee.com");
+
+        var loginPage = new LoginPageUpgraded(page);
+        await loginPage.ClickLogin();
+        await loginPage.Login("admin", "password");
+        var isExist = await loginPage.IsEmployeeDetailsExists();
+        Assert.IsTrue(isExist);
     }
 }
